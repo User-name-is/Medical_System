@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智慧醫療諮詢 AI Chatbot</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, "Microsoft JhengHei", sans-serif;
+    background: #e9eef5;
+    display: flex;
+    justify-content: center;
+    padding: 30px 0;
+}
+
+.phone {
+    width: 390px;
+    height: 760px;
+    background: white;
+    border-radius: 28px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.header {
+    background: #12355b;
+    color: white;
+    padding: 18px;
+    font-size: 21px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.chat {
+    flex: 1;
+    padding: 18px;
+    overflow-y: auto;
+    background: #f7f9fc;
+}
+
+.welcome {
+    text-align: center;
+    padding: 20px 5px;
+}
+
+.welcome h2 {
+    color: #12355b;
+    font-size: 22px;
+}
+
+.welcome p {
+    color: #666;
+    line-height: 1.6;
+}
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.menu-btn {
+    border: none;
+    background: white;
+    border-radius: 15px;
+    padding: 22px 10px;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    color: #12355b;
+}
+
+.menu-btn:hover {
+    background: #eef5ff;
+}
+
+.msg {
+    max-width: 78%;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    border-radius: 14px;
+    line-height: 1.6;
+    font-size: 15px;
+}
+
+.bot {
+    background: white;
+    border: 1px solid #ddd;
+}
+
+.user {
+    background: #12355b;
+    color: white;
+    margin-left: auto;
+}
+
+.ai {
+    background: #eef5ff;
+    border: 1px solid #bcd4f6;
+    max-width: 85%;
+}
+
+.warning {
+    font-size: 13px;
+    color: #777;
+    padding: 10px 18px;
+    background: #fff7e6;
+}
+
+.input-area {
+    display: none;
+    padding: 12px;
+    border-top: 1px solid #ddd;
+    background: white;
+}
+
+.input-area.active {
+    display: flex;
+}
+
+input[type="text"] {
+    flex: 1;
+    padding: 12px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    outline: none;
+    min-width: 0;
+}
+
+button.submit {
+    margin-left: 8px;
+    background: #12355b;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.info-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 14px;
+    padding: 15px;
+    line-height: 1.7;
+    font-size: 15px;
+}
+
+.home-btn {
+    background: #12355b;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 15px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.emergency-btn {
+    width: 100%;
+    margin-top: 15px;
+    background: #c62828;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.emergency-result {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 12px;
+    line-height: 1.7;
+    display: none;
+}
+
+.check-item {
+    display: block;
+    margin: 10px 0;
+    line-height: 1.6;
+}
+
+.check-item input {
+    margin-right: 8px;
+}
+
+.green-text {
+    color: #2e7d32;
+    font-weight: bold;
+}
+
+.yellow-text {
+    color: #b8860b;
+    font-weight: bold;
+}
+
+.red-text {
+    color: #c62828;
+    font-weight: bold;
+}
+
+.more-symptoms {
+    margin-top: 18px;
+    padding: 12px;
+    background: #f5f7fa;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+}
+
+.more-symptoms summary {
+    cursor: pointer;
+    font-weight: bold;
+    color: #12355b;
+}
+
+.symptom-hint {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.6;
+}
+
+.modal {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.modal-content {
+    width: 335px;
+    max-height: 570px;
+    background: white;
+    border-radius: 16px;
+    padding: 18px;
+    overflow-y: auto;
+}
+
+.modal-title {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 20px;
+    margin-bottom: 12px;
+}
+
+.close {
+    cursor: pointer;
+    font-size: 24px;
+}
+
+.search-box {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.search-box input {
+    flex: 1;
+    padding: 8px;
+}
+
+.search-box button {
+    background: #12355b;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 10px;
+}
+
+.record {
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 0;
+        background: white;
+    }
+
+    .phone {
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .modal {
+        position: fixed;
+    }
+
+    .modal-content {
+        width: calc(100vw - 40px);
+        max-height: 75vh;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="phone">
+
+<div class="header">🏥 智慧醫療諮詢 AI Chatbot</div>
+
+<div class="chat">
+
+    <div class="welcome" id="welcomePage">
+        <h2>您好，我是您的醫療問診小助手</h2>
+        <p>請選擇您需要的服務。</p>
+
+        <div class="menu-grid">
+            <button class="menu-btn" type="button" onclick="showConsult()">🩺<br>症狀諮詢</button>
+            <button class="menu-btn" type="button" onclick="openModal()">📋<br>問診紀錄</button>
+            <button class="menu-btn" type="button" onclick="showEmergency()">🚑<br>緊急評估</button>
+            <button class="menu-btn" type="button" onclick="showInfo()">ℹ️<br>系統介紹</button>
+        </div>
+    </div>
+
+    <div id="consultPage" style="display:none;">
+        <button class="home-btn" type="button" onclick="goHome()">🏠 Home</button>
+        <div class="msg bot">🤖 請描述您目前的不適症狀。</div>
+
+        {% if user_input %}
+            <div class="msg user">👤 {{ user_input }}</div>
+
+            {% if ai_response %}
+                <div class="msg bot ai">
+                    🤖 {{ ai_response | replace('\n', '<br>') | safe }}
+                </div>
+            {% else %}
+                <div class="msg bot">
+                    🤖 已取得初步科別建議，但 AI 回覆暫時無法產生。
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <div id="emergencyPage" style="display:none;">
+        <button class="home-btn" type="button" onclick="goHome()">🏠 Home</button>
+
+        <div class="info-card">
+            <h3>🚑 緊急評估</h3>
+            <p>請勾選您目前出現的狀況：</p>
+
+            <p class="symptom-hint">
+                請先勾選目前最明顯的症狀。若有比較嚴重的情況，再展開下方選項。
+            </p>
+
+            <label class="check-item green-text">
+                <input type="checkbox" class="green-check" value="喉嚨發炎或喉嚨痛">
+                喉嚨發炎或喉嚨痛
+            </label>
+
+            <label class="check-item green-text">
+                <input type="checkbox" class="green-check" value="咳嗽">
+                咳嗽
+            </label>
+
+            <label class="check-item green-text">
+                <input type="checkbox" class="green-check" value="流鼻水">
+                流鼻水
+            </label>
+
+            <label class="check-item green-text">
+                <input type="checkbox" class="green-check" value="鼻塞">
+                鼻塞
+            </label>
+
+            <label class="check-item green-text">
+                <input type="checkbox" class="green-check" value="打噴嚏">
+                打噴嚏
+            </label>
+
+            <label class="check-item green-text">
+                <input type="checkbox" class="green-check" value="聲音沙啞">
+                聲音沙啞
+            </label>
+
+            <label class="check-item green-text">
+                <input type="checkbox" class="green-check" value="輕微發燒">
+                輕微發燒（未超過 38.5 度）
+            </label>
+
+            <label class="check-item green-text">
+                <input type="checkbox" class="green-check" value="痰多">
+                痰多
+            </label>
+
+            <details class="more-symptoms">
+                <summary>如果有比較嚴重的狀況，點這裡勾選</summary>
+
+                <label class="check-item red-text">
+                    <input type="checkbox" class="red-check" value="劇烈胸痛或胸悶">
+                    劇烈胸痛或胸悶
+                </label>
+
+                <label class="check-item red-text">
+                    <input type="checkbox" class="red-check" value="呼吸困難或喘不過氣">
+                    呼吸困難或喘不過氣
+                </label>
+
+                <label class="check-item red-text">
+                    <input type="checkbox" class="red-check" value="意識不清或昏倒">
+                    意識不清或昏倒
+                </label>
+
+                <label class="check-item red-text">
+                    <input type="checkbox" class="red-check" value="單側手腳無力或口齒不清">
+                    單側手腳無力或口齒不清
+                </label>
+
+                <label class="check-item red-text">
+                    <input type="checkbox" class="red-check" value="嚴重出血或外傷">
+                    嚴重出血或外傷
+                </label>
+
+                <label class="check-item yellow-text">
+                    <input type="checkbox" class="yellow-check" value="高燒超過39度">
+                    高燒超過 39 度
+                </label>
+
+                <label class="check-item yellow-text">
+                    <input type="checkbox" class="yellow-check" value="持續嘔吐無法進食">
+                    持續嘔吐無法進食
+                </label>
+
+                <label class="check-item yellow-text">
+                    <input type="checkbox" class="yellow-check" value="嚴重腹痛持續數小時">
+                    嚴重腹痛持續數小時
+                </label>
+
+                <label class="check-item yellow-text">
+                    <input type="checkbox" class="yellow-check" value="劇烈頭痛且休息後未改善">
+                    劇烈頭痛且休息後未改善
+                </label>
+
+                <label class="check-item yellow-text">
+                    <input type="checkbox" class="yellow-check" value="持續暈眩或站立困難">
+                    持續暈眩或站立困難
+                </label>
+            </details>
+
+            <button class="emergency-btn" type="button" onclick="checkEmergency()">開始評估</button>
+
+            <div id="emergencyResult" class="emergency-result"></div>
+        </div>
+    </div>
+
+    <div id="infoPage" style="display:none;">
+        <button class="home-btn" type="button" onclick="goHome()">🏠 Home</button>
+
+        <div class="info-card">
+            <h3>ℹ️ 系統使用說明</h3>
+
+            <p>本系統可協助您依照身體不適症狀，查詢初步建議科別與健康資訊。</p>
+
+            <hr>
+
+            <h4>🩺 症狀諮詢</h4>
+            <p>輸入症狀，例如「頭痛又發燒」、「腰痛而且頻尿」，系統會推薦可能適合的科別，並提供健康資訊輔助回覆。</p>
+
+            <h4>📋 問診紀錄</h4>
+            <p>可查看過去輸入過的症狀、建議科別與查詢日期。</p>
+
+            <h4>🚑 緊急評估</h4>
+            <p>勾選目前症狀後，系統會依照狀況分為高、中、低風險，並提供初步就醫提醒。</p>
+
+            <p>⚠️ 本系統僅提供初步參考，不能取代醫師診斷。</p>
+        </div>
+    </div>
+
+</div>
+
+<div class="warning">
+⚠️ 本系統僅提供初步科別建議，實際診斷仍需由專業醫師判斷。
+</div>
+
+<form class="input-area {% if user_input %}active{% endif %}" id="inputArea" method="POST">
+    <input type="text" name="user_input" placeholder="請輸入您的症狀..." required>
+    <button class="submit" type="submit">➤</button>
+</form>
+
+<div class="modal" id="recordModal">
+    <div class="modal-content">
+        <div class="modal-title">
+            問診紀錄
+            <span class="close" onclick="closeModal()">×</span>
+        </div>
+
+        <form class="search-box" method="GET">
+            <input type="hidden" name="show_records" value="1">
+            <input type="date" name="search_date" value="{{ search_date if search_date else '' }}">
+            <button type="submit">查詢</button>
+        </form>
+
+        {% if records %}
+            {% for record in records %}
+            <div class="record">
+                日期：{{ record[0] }}<br>
+                症狀：{{ record[1] }}<br>
+                建議科別：{{ record[2] }}<br>
+                說明：{{ record[3] }}
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>目前沒有問診紀錄。</p>
+        {% endif %}
+    </div>
+</div>
+
+</div>
+
+<script>
+function hideAllPages() {
+    document.getElementById("welcomePage").style.display = "none";
+    document.getElementById("consultPage").style.display = "none";
+    document.getElementById("emergencyPage").style.display = "none";
+    document.getElementById("infoPage").style.display = "none";
+}
+
+function showConsult() {
+    hideAllPages();
+    document.getElementById("consultPage").style.display = "block";
+    document.getElementById("inputArea").classList.add("active");
+}
+
+function showEmergency() {
+    hideAllPages();
+    document.getElementById("emergencyPage").style.display = "block";
+    document.getElementById("inputArea").classList.remove("active");
+}
+
+function showInfo() {
+    hideAllPages();
+    document.getElementById("infoPage").style.display = "block";
+    document.getElementById("inputArea").classList.remove("active");
+}
+
+function goHome() {
+    hideAllPages();
+    document.getElementById("welcomePage").style.display = "block";
+    document.getElementById("inputArea").classList.remove("active");
+}
+
+function checkEmergency() {
+    const redChecks = document.querySelectorAll(".red-check");
+    const yellowChecks = document.querySelectorAll(".yellow-check");
+    const greenChecks = document.querySelectorAll(".green-check");
+
+    let redCount = 0;
+    let yellowCount = 0;
+    let greenCount = 0;
+    let selectedGreenSymptoms = [];
+
+    redChecks.forEach(check => {
+        if (check.checked) {
+            redCount++;
+        }
+    });
+
+    yellowChecks.forEach(check => {
+        if (check.checked) {
+            yellowCount++;
+        }
+    });
+
+    greenChecks.forEach(check => {
+        if (check.checked) {
+            greenCount++;
+            selectedGreenSymptoms.push(check.value);
+        }
+    });
+
+    const result = document.getElementById("emergencyResult");
+    result.style.display = "block";
+
+    if (redCount === 0 && yellowCount === 0 && greenCount === 0) {
+        result.style.background = "#f5f5f5";
+        result.style.border = "1px solid #ccc";
+        result.innerHTML = `
+            請先勾選至少一項症狀，再開始評估。
+        `;
+        return;
+    }
+
+    if (redCount > 0) {
+        result.style.background = "#ffebee";
+        result.style.border = "1px solid #ef9a9a";
+        result.innerHTML = `
+            🔴 緊急程度：高<br><br>
+            您勾選的症狀屬於高風險警訊。<br>
+            建議立即前往急診，或撥打 119 尋求協助。<br><br>
+            請避免自行開車前往醫院。
+        `;
+    } else if (yellowCount > 0) {
+        result.style.background = "#fff8e1";
+        result.style.border = "1px solid #ffe082";
+        result.innerHTML = `
+            🟡 緊急程度：中<br><br>
+            您目前有 ${yellowCount} 項需要注意的症狀。<br>
+            建議於今日或 24 小時內至門診或醫療院所就醫。<br><br>
+            若症狀惡化，請立即前往急診。
+        `;
+    } else {
+        let department = "家醫科";
+
+        if (
+            selectedGreenSymptoms.includes("喉嚨發炎或喉嚨痛") ||
+            selectedGreenSymptoms.includes("咳嗽") ||
+            selectedGreenSymptoms.includes("流鼻水") ||
+            selectedGreenSymptoms.includes("鼻塞") ||
+            selectedGreenSymptoms.includes("打噴嚏") ||
+            selectedGreenSymptoms.includes("聲音沙啞") ||
+            selectedGreenSymptoms.includes("痰多")
+        ) {
+            department = "耳鼻喉科或家醫科";
+        }
+
+        result.style.background = "#e8f5e9";
+        result.style.border = "1px solid #a5d6a7";
+        result.innerHTML = `
+            🟢 緊急程度：低<br><br>
+            目前勾選的症狀較偏向一般常見症狀。<br>
+            初步建議可先掛號：<b>${department}</b>。<br><br>
+            建議多休息、補充水分，並持續觀察症狀。<br>
+            若症狀持續惡化或發燒不退，仍建議就醫。
+        `;
+    }
+}
+
+function openModal() {
+    document.getElementById("recordModal").style.display = "flex";
+}
+
+function closeModal() {
+    document.getElementById("recordModal").style.display = "none";
+}
+
+window.onload = function() {
+    const hasUserInput = "{{ user_input }}" !== "";
+
+    if (hasUserInput) {
+        document.getElementById("welcomePage").style.display = "none";
+        document.getElementById("consultPage").style.display = "block";
+        document.getElementById("inputArea").classList.add("active");
+    } else {
+        document.getElementById("welcomePage").style.display = "block";
+        document.getElementById("consultPage").style.display = "none";
+        document.getElementById("inputArea").classList.remove("active");
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("show_records") === "1") {
+        openModal();
+    }
+}
+</script>
+
+</body>
+</html>
